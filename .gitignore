@@ -1,0 +1,5 @@
+/privacy-scheduling-tools/sample/out/
+__pycache__/
+*.pyc
+*.idea
+*.DS_store
