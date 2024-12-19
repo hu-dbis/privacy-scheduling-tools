@@ -1,0 +1,74 @@
+[
+	{
+	"schedule_id": 0,
+	"available_machines": 2,
+	"jobs": [
+			{
+				"job_id": 0,
+				"weight": 5,
+				"processing_time": 10
+			},
+			{
+				"job_id": 1,
+				"weight": 2,
+				"processing_time": 12
+			},
+			{
+				"job_id": 2,
+				"weight": 3,
+				"processing_time": 8
+			},
+			{
+				"job_id": 3,
+				"weight": 4,
+				"processing_time": 6
+			},
+			{
+				"job_id": 4,
+				"weight": 5,
+				"processing_time": 5
+			}
+		]
+	},
+	{
+	"schedule_id": 1,
+	"available_machines": 3,
+	"jobs": [
+			{
+				"job_id": 0,
+				"weight": 4,
+				"processing_time": 20
+			},
+			{
+				"job_id": 1,
+				"weight": 2,
+				"processing_time": 20
+			},
+			{
+				"job_id": 2,
+				"weight": 3,
+				"processing_time": 15
+			},
+			{
+				"job_id": 3,
+				"weight": 2,
+				"processing_time": 18
+			},
+			{
+				"job_id": 4,
+				"weight": 1,
+				"processing_time": 10
+			},
+			{
+				"job_id": 5,
+				"weight": 2,
+				"processing_time": 40
+			},
+			{
+				"job_id": 6,
+				"weight": 5,
+				"processing_time": 60
+			}
+		]
+	}
+]

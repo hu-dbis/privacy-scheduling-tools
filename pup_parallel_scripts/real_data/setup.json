@@ -1,0 +1,14 @@
+{
+	"trials": 1000,
+	"time_limit": 300,
+	"num_workers": 1,
+	"source_path": "pup_parallel_scripts/real_data/experiment_results",
+	"transformations": ["MOVE", "MOVE_PROC", "SWAP_ALL", "SWAP_ALL_PROC", "PROCESSING_TIMES"],
+	"utility_functions": ["calculate_avg_wait_time", "calculate_twct"],
+	"privacy_thresholds": [0.01, 0.5],
+	"utility_thresholds": [0.005, 0.02],
+	"scheduling_parameters": {
+		"processing_time_domain": [5, 300],
+		"weight_domain": [1,5]
+	}
+}

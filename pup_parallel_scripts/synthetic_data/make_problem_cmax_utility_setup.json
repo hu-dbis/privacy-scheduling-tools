@@ -1,0 +1,15 @@
+{
+	"trials": 1000,
+	"time_limit": 300,
+	"num_workers": 50,
+	"source_path": "pup_parallel_scripts/synthetic_data/results",
+	"transformations": ["MOVE", "MOVE_PROC", "SWAP_ALL", "SWAP_ALL_PROC", "PROCESSING_TIMES"],
+	"utility_functions": ["calculate_cmax"],
+	"privacy_thresholds": [0.01, 0.5],
+	"utility_thresholds": [0.005, 0.02],
+	"scheduling_parameters": {
+		"processing_time_domain": [5, 50],
+		"weight_domain": [0,9]
+	},
+	"schedule_type": "make"
+}

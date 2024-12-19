@@ -1,0 +1,33 @@
+{
+  "schedules": "sample/output_transformations/comparison_transformations/07312023_104612/calculate_twct/calculate_twct_07312023_104612_m4_n5-20_p5-50_w1-10_r1000_schedules.schdls",
+  "utility_function": "calculate_twct",
+  "workers": 56,
+  "trials": 1000,
+  "timeout_after": 300,
+  "utility_thresholds": [
+    0.005,
+    0.02
+  ],
+  "privacy_thresholds": [
+    0.01,
+    0.5
+  ],
+  "transformations": [
+    "Transformation.SWAP_ALL",
+    "Transformation.ALT_MOVE",
+    "Transformation.ALT_MOVE_PROC",
+    "Transformation.SWAP_ALL_PROC"
+  ],
+  "scheduling_parameters": {
+    "max_machines": 4,
+    "job_range": [
+      5,
+      20
+    ],
+    "p_range": [
+      5,
+      50
+    ],
+    "max_weight": 10
+  }
+}

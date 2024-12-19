@@ -1,0 +1,15 @@
+{
+	"trials": 10,
+	"time_limit": 60,
+	"num_workers": 4,
+	"source_path": "pup_parallel_scripts/synthetic_data/results",
+	"transformations": ["MOVE_REL", "SWAP_ALL_REL", "SRP", "MRP"],
+	"utility_functions": ["calculate_avg_wait_time_with_release_dates"],
+	"privacy_thresholds": [0.01, 0.5],
+	"utility_thresholds": [0.005, 0.02],
+	"scheduling_parameters": {
+		"processing_time_domain": [5, 20],
+		"weight_domain": [0,9]
+	},
+	"schedule_type": "make"
+}

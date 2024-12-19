@@ -1,0 +1,1 @@
+Used schedule params and schedule list in /vol/home-vol3/dbisteam/basmermo/Projekte/schedule_privacy/privacy-scheduling-tools/sample/output_transformations/comparison_transformations/07312023_104612/calculate_avg_wait_time/calculate_avg_wait_time_08032023_013104_m4_n5-20_p5-50_w1-10_r1000_schedules.schdls
