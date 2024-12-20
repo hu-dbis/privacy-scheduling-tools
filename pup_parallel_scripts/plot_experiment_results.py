@@ -232,17 +232,22 @@ def get_successful(out_df, param_df, ut, pt):
 
 def create_time_plot(data, uf, x_axis, f_name):
     plt.clf()
-    ax = sns.lineplot(data=data, x=x_axis, y="time_found", hue="transformation", style='transformation',
-                      markers=True, dashes=False, err_style='band', palette='Greys')
-    # err_kws={'elinewidth': 0.5,'capsize': 2}
-    if x_axis == 'w_max':
-        ax.set(xlabel='$w_{max}$', ylabel='Time (in s)')
-    plt.legend(title='Perturbation')
-    # plt.show()
+    with sns.axes_style("ticks"):
+        ax = sns.lineplot(data=data, x=x_axis, y="time_found", hue="transformation", style='transformation',
+                          markers=True, dashes=False, err_style='band', palette='Greys')
+        #err_kws={'elinewidth': 0.5,'capsize': 2}
+        ax.tick_params(colors='black')
+        for spine in ax.spines.values():
+            spine.set_edgecolor('black')
+            spine.set_linewidth(1)
+        if x_axis == 'w_max':
+            ax.set(xlabel='$w_{max}$', ylabel='Time (in s)')
+        plt.legend(title='Perturbation')
+        #plt.show()
 
-    if x_axis == 'w_max':
-        ax.get_figure().savefig(f'plots/time-{uf}-{f_name}-weights.pdf', dpi=300, format="pdf", bbox_inches='tight')
-    plt.clf()
+        if x_axis == 'w_max':
+            ax.get_figure().savefig(f'plots/time-{uf}-{f_name}-weights.pdf', dpi=300, format="pdf", bbox_inches='tight')
+        plt.clf()
 
 
 def create_time_barplot(data, uf, x_axis, f_name, bar=True):
