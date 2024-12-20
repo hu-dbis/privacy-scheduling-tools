@@ -1,11 +1,11 @@
+import matplotlib
 import matplotlib.pyplot as plt
 import pandas as pd
 import seaborn as sns
 import matplotlib.ticker as ticker
-from matplotlib.ticker import MaxNLocator, PercentFormatter
 import matplotlib.patches as mpatches
 import matplotlib.colors as colors
-from venn import venn, pseudovenn
+from venn import venn
 import os
 
 # Set font size
@@ -22,6 +22,8 @@ plt.rc('legend', fontsize=SMALL_SIZE)  # legend fontsize
 plt.rc('figure', titlesize=BIGGER_SIZE)  # fontsize of the figure title
 
 inverse_colors = {v:k for k,v in colors.get_named_colors_mapping().items()}
+matplotlib.rcParams['pdf.fonttype'] = 42
+matplotlib.rcParams['ps.fonttype'] = 42
 
 def load_data(path, utility_name, result_type):
     uf_path = os.path.join(path, utility_name)
@@ -33,34 +35,54 @@ def load_data(path, utility_name, result_type):
     # swap : \u21C4
     # move : \u21B7
     # proc : \u21C5
-
-    # df.transformation = df.transformation.astype("str").apply(lambda t: t.replace("PROCESSING_TIMES", "P"))
-    # df.transformation = df.transformation.astype("str").apply(lambda t: t.replace("ALT_MOVE_PROC", "M*P"))
-    # df.transformation = df.transformation.astype("str").apply(lambda t: t.replace("MOVE_PROC", "MP"))
-    # df.transformation = df.transformation.astype("str").apply(lambda t: t.replace("ALT_MOVE", "M*"))
-    # df.transformation = df.transformation.astype("str").apply(lambda t: t.replace("MOVE", "M"))
-    # df.transformation = df.transformation.astype("str").apply(lambda t: t.replace("SWAPPING_JOBS", "S"))
-    # df.transformation = df.transformation.astype("str").apply(lambda t: t.replace("SWAP_PROC", "SP"))
-    # df.transformation = df.transformation.astype("str").apply(lambda t: t.replace("SWAP_ALL_PROC", "S*P"))
-    # df.transformation = df.transformation.astype("str").apply(lambda t: t.replace("SWAP_ALL", "S*"))
-
     df.transformation = df.transformation.astype("str").apply(lambda t: t.replace("PROCESSING_TIMES", "P"))
     df.transformation = df.transformation.astype("str").apply(lambda t: t.replace("MOVE_PROC", "MP"))
     df.transformation = df.transformation.astype("str").apply(lambda t: t.replace("MOVE", "M"))
     df.transformation = df.transformation.astype("str").apply(lambda t: t.replace("SWAP_ALL_PROC", "SP"))
     df.transformation = df.transformation.astype("str").apply(lambda t: t.replace("SWAP_ALL", "S"))
 
-    print(df)
+    #print(df)
+
+    return df
+
+def load_data_to_merge(path, utility_name, result_type):
+    uf_path = os.path.join(path, utility_name)
+    file_ending = result_type + ".csv"
+    files = [filename for filename in os.listdir(uf_path) if filename.endswith(file_ending)]
+    assert len(files) == 1
+    df = pd.read_csv(os.path.join(uf_path, files[0]))
+
+    # swap : \u21C4
+    # move : \u21B7
+    # proc : \u21C5
+
+    df.transformation = df.transformation.astype("str").apply(lambda t: t.replace("PROCESSING_TIMES", "P"))
+    df.transformation = df.transformation.astype("str").apply(lambda t: t.replace("ALT_MOVE_PROC", "M*P"))
+    df.transformation = df.transformation.astype("str").apply(lambda t: t.replace("MOVE_PROC", "MP"))
+    df.transformation = df.transformation.astype("str").apply(lambda t: t.replace("ALT_MOVE", "M*"))
+    df.transformation = df.transformation.astype("str").apply(lambda t: t.replace("MOVE", "M"))
+    df.transformation = df.transformation.astype("str").apply(lambda t: t.replace("SWAPPING_JOBS", "S"))
+    df.transformation = df.transformation.astype("str").apply(lambda t: t.replace("SWAP_PROC", "SP"))
+    df.transformation = df.transformation.astype("str").apply(lambda t: t.replace("SWAP_ALL_PROC", "S*P"))
+    df.transformation = df.transformation.astype("str").apply(lambda t: t.replace("SWAP_ALL", "S*"))
+
+    #print(df)
 
     return df
 
 
-def load_measures(path, utility_name):
-    return load_data(path, utility_name, 'measures')
+def load_measures(path, utility_name, merge=False):
+    if merge:
+        return load_data_to_merge(path, utility_name, 'measures')
+    else:
+        return load_data(path, utility_name, 'measures')
 
 
-def load_outcomes(path, utility_name):
-    return load_data(path, utility_name, 'outcomes')
+def load_outcomes(path, utility_name, merge=False):
+    if merge:
+        return load_data_to_merge(path, utility_name, 'outcomes')
+    else:
+        return load_data(path, utility_name, 'outcomes')
 
 
 def create_multiple_charts(df, uf, filename, reverse=False, color=True, legend=False, show_labels=False, count_schedules=10):
@@ -71,7 +93,7 @@ def create_multiple_charts(df, uf, filename, reverse=False, color=True, legend=F
     row_name = "\u03B4" if reverse else '\u03B5'
 
     grid = sns.FacetGrid(df, col=row_name, row=col_name, ylim=(0, count_schedules), margin_titles=True,
-                         sharex=True, sharey=True, legend_out=True, height=5, aspect=0.75)
+                         sharex=False, sharey=True, legend_out=True, height=5, aspect=0.75)
     grid.set_ylabels("Rel. Frequency")
     palette = {"non-empty": "gold", "empty": "orange", "both": "yellow", "exhausted": "teal",
                "timeout": "darkslategray"}
@@ -112,12 +134,12 @@ def create_multiple_charts(df, uf, filename, reverse=False, color=True, legend=F
 
                     v.set_facecolor('white')
 
-        if show_labels:
-            for c in axes.containers:
-                labels = []
-                for i, v in enumerate(c):
-                    labels.append(int(v.get_height()))
-                axes.bar_label(c, labels=labels, label_type='center')
+    if show_labels:
+        for c in axes.containers:
+            labels = []
+            for i, v in enumerate(c):
+                labels.append(int(v.get_height()))
+            axes.bar_label(c, labels=labels, label_type='center')
 
     if legend:
         if color:
@@ -141,7 +163,7 @@ def create_multiple_charts(df, uf, filename, reverse=False, color=True, legend=F
                                           "Both": both_patch,
                                           "Exhausted": exhausted_patch,
                                           "Timeout": timeout_patch})
-        l = sns.move_legend(l, "lower right", bbox_to_anchor=(1.2, 1), frameon=True, ncol=5)
+        l = sns.move_legend(l, "lower right", bbox_to_anchor=(1, 1), frameon=True, ncol=5)
     grid.fig.tight_layout()
     grid.savefig(f'plots/transformations-{uf}-{filename}.pdf', dpi=300, format="pdf")
     # plt.show()
@@ -208,8 +230,6 @@ def get_successful(out_df, param_df, ut, pt):
     df = df[(df.outcome == 'empty') | (df.outcome == 'non-empty') | (df.outcome == 'both')]
     return df
 
-
-# %%
 def create_time_plot(data, uf, x_axis, f_name):
     plt.clf()
     ax = sns.lineplot(data=data, x=x_axis, y="time_found", hue="transformation", style='transformation',
@@ -256,20 +276,20 @@ def visualize_results(path, param_file, utility, fname, schedule_count=1000, leg
     visualize_results_from_dfs(outcomes_df, measures_df, params_df, utility.replace("_alt", ""), fname, schedule_count, legend, p)
 
 
-def get_data(path, param_file, utility):
+def get_data(path, param_file, utility, merge=False):
     if param_file:
         params_path = os.path.join(path, utility, param_file)
         params_df = pd.read_csv(params_path)
     else:
         params_df = None
 
-    outcomes_df = load_outcomes(path, utility)
-    measures_df = load_measures(path, utility)
+    outcomes_df = load_outcomes(path, utility, merge)
+    measures_df = load_measures(path, utility, merge)
 
     return outcomes_df, measures_df, params_df
 
 
-def visualize_results_from_dfs(outcomes_df, measures_df, params_df, utility, fname, schedule_count=1000, legend=True, p=None):
+def visualize_results_from_dfs(outcomes_df, measures_df, params_df, utility, fname, schedule_count=1000, legend=True, p=None, timeplot=False):
     # 2x2 grid chart with success rates
     if p == 0.01:
         sel_outcomes_df = outcomes_df[(outcomes_df.privacy_threshold == 0.01) & (
@@ -282,7 +302,7 @@ def visualize_results_from_dfs(outcomes_df, measures_df, params_df, utility, fna
             ((outcomes_df.privacy_threshold == 0.01) ^ (outcomes_df.privacy_threshold == 0.5)) & (
                     (outcomes_df.utility_threshold == 0.02) ^ (outcomes_df.utility_threshold == 0.005))]
 
-    create_multiple_charts(sel_outcomes_df, utility, fname, color=False, legend=legend, reverse=True, count_schedules=schedule_count, show_labels=True)
+    create_multiple_charts(sel_outcomes_df, utility, fname, color=False, legend=legend, reverse=True, count_schedules=schedule_count, show_labels=False)
 
     # Venn Diagram
     p_df = outcomes_df[(outcomes_df.transformation == "P") & (
@@ -303,24 +323,31 @@ def visualize_results_from_dfs(outcomes_df, measures_df, params_df, utility, fna
 
     create_venn5_diagram(utility, 0.02, 0.5, p_df, m_df, s_df, sp_df, mp_df, fname, fsize=18)
 
-    # time charts
-    #joint_df = measures_df.join(params_df, on="id", rsuffix="_p", lsuffix="_s")
-    #times_df = get_min_time_until_found(joint_df, 0.02, 0.5)
-    #create_time_plot(times_df, utility, 'w_max', fname)
-    #create_time_barplot(times_df, utility, 'w_max', fname, False)
+    #time charts
+    if timeplot:
+        joint_df = measures_df.join(params_df, on="id", rsuffix="_p", lsuffix="_s")
+        times_df = get_min_time_until_found(joint_df, 0.02, 0.5)
+        create_time_plot(times_df, utility, 'w_max', fname)
+        #create_time_barplot(times_df, utility, 'w_max', fname, False)
 
 
 # TWCT results - real world data
-#visualize_results("Results/real_world_data",
-#                  None,
-#                  "calculate_twct",
-#                  "real_world_data-no_legend")
+visualize_results("Results/real_world_data",
+                  None,
+                 "calculate_twct",
+                  "real_world_data",
+                  schedule_count = 30,
+                  legend = False,
+                  p=0.5)
 
-# AVGW results - real world data
-#visualize_results("Results/real_world_data",
-#                  None,
-#                  "calculate_avg_wait_time",
-#                  "real_world_data-no_legend")
+#AVGW results - real world data
+visualize_results("Results/real_world_data",
+                  None,
+                  "calculate_avg_wait_time",
+                  "real_world_data",
+                  schedule_count = 30,
+                  legend = False,
+                  p = 0.5)
 
 
 #CMAX results - MAKE synthetic data
@@ -370,3 +397,79 @@ visualize_results("Results/make_synthetic/",
                   "make-synthetic-1000-all-no_legend",
                   schedule_count=1000,
                   legend=False)
+
+path = "Results/"
+
+# TWCT results with new swap neighborhood
+old_twct_outcomes, old_twct_measures, twct_params_df = get_data(path,
+                                                                "calculate_twct_07312023_104612_m4_n5-20_p5-50_w1-10_r1000_schedule_params.csv",
+                                                                "calculate_twct", merge=True)
+
+alt_twct_outcomes, alt_twct_measures, _ = get_data(path,
+                                                   "calculate_twct_07312023_104612_m4_n5-20_p5-50_w1-10_r1000_schedule_params.csv",
+                                                   "calculate_twct_alt", merge=True)
+concat_outcomes = pd.concat([old_twct_outcomes, alt_twct_outcomes], ignore_index=True)
+# display(concat_outcomes)
+concat_measures = pd.concat([old_twct_measures, alt_twct_measures], ignore_index=True)
+# display(concat_measures)
+sorted_twct_outcomes = concat_outcomes.sort_values(by='transformation', ascending=True, inplace=False)
+
+#visualize_results_from_dfs(sorted_twct_outcomes,
+#                           concat_measures,
+#                           twct_params_df,
+#                           "calculate_twct",
+#                           "concat-sorted")
+
+twct_outcomes_w_alt = (concat_outcomes[concat_outcomes['transformation'].isin(['P', 'S*', 'S*P', 'MP', 'M'])]).copy()
+twct_outcomes_w_alt['transformation'] = twct_outcomes_w_alt['transformation'].str.replace('\*', '', regex=True)
+# display(twct_outcomes_w_alt)
+
+twct_measures_w_alt = (concat_measures[concat_measures['transformation'].isin(['P', 'S*', 'S*P', 'MP', 'M'])]).copy()
+twct_measures_w_alt['transformation'] = twct_measures_w_alt['transformation'].str.replace('\*', '', regex=True)
+# display(twct_measures_w_alt)
+
+visualize_results_from_dfs(twct_outcomes_w_alt,
+                           twct_measures_w_alt,
+                           twct_params_df,
+                           "calculate_twct",
+                           "all-with-alt",
+                           timeplot=True)
+
+# AWT results with new swap neighborhood
+old_awt_outcomes, old_awt_measures, awt_params_df = get_data(path,
+                         "calculate_avg_wait_time_08032023_013104_m4_n5-20_p5-50_w1-10_r1000_schedule_params.csv",
+                         "calculate_avg_wait_time", merge=True)
+alt_awt_outcomes, alt_awt_measures, _ = get_data(path,
+                         "calculate_avg_wait_time_08032023_013104_m4_n5-20_p5-50_w1-10_r1000_schedule_params.csv",
+                         "calculate_avg_wait_time_alt", merge=True)
+concat_awt_outcomes = pd.concat([old_awt_outcomes, alt_awt_outcomes], ignore_index=True)
+concat_awt_measures = pd.concat([old_awt_measures, alt_awt_measures], ignore_index=True)
+
+#visualize_results_from_dfs(concat_awt_outcomes,
+#                           concat_awt_measures,
+#                           awt_params_df,
+#                           "calculate_avg_wait_time",
+#                           "awt-concat")
+
+sorted_awt_outcomes = concat_awt_outcomes.sort_values(by='transformation', ascending=True, inplace=False)
+
+#visualize_results_from_dfs(sorted_awt_outcomes,
+#                          concat_awt_measures,
+#
+#                          awt_params_df,
+#                           "calculate_avg_wait_time",
+#                           "awt-concat-sorted")
+
+awt_outcomes_w_alt = (concat_awt_outcomes[concat_awt_outcomes['transformation'].isin(['P', 'S*', 'S*P', 'MP', 'M'])]).copy()
+awt_outcomes_w_alt['transformation'] = awt_outcomes_w_alt['transformation'].str.replace('\*', '', regex=True)
+
+awt_measures_w_alt = (concat_awt_measures[concat_awt_measures['transformation'].isin(['P', 'S*', 'S*P', 'MP', 'M'])]).copy()
+awt_measures_w_alt['transformation'] = awt_measures_w_alt['transformation'].str.replace('\*', '', regex=True)
+
+visualize_results_from_dfs(awt_outcomes_w_alt,
+                           awt_measures_w_alt,
+                           awt_params_df,
+                           "calculate_avg_wait_time",
+                           "all-with-alt",
+                           timeplot=True)
+

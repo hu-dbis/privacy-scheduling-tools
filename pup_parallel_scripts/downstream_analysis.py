@@ -3,13 +3,8 @@ import csv
 import os
 import pickle
 import re
-from collections import Counter
 from statistics import mean
-
-import scipy
-from pyemd import emd, emd_samples
 from scipy.stats import wasserstein_distance
-import numpy as np
 #from dit.divergences import earth_movers_distance
 
 from privacyschedulingtools.total_weighted_completion_time.pup.utility_functions.parallel_machine_utilities import \
